@@ -17,6 +17,7 @@ func TestResize(t *testing.T) {
 	if _, err := os.Stat(resizefile); !os.IsNotExist(err) {
 		t.Fail()
 	}
+	createPathToFile(resizefile)
 	// Do the resizing
 	resizeJpeg(origfile, resizefile, 128)
 	// Check if a new file is there

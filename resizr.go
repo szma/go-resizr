@@ -8,11 +8,17 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
+}
 
 func checkIfTargetImageExists(outName string, size int) (bool, error) {
 	//File exists?
@@ -33,7 +39,7 @@ func checkIfTargetImageExists(outName string, size int) (bool, error) {
 	}
 
 	//Size is already ok?
-	maxsize := int(math.Max(float64(img.Bounds().Size().X), float64(img.Bounds().Size().Y)))
+	maxsize := max(img.Bounds().Size().X, img.Bounds().Size().Y)
 	return maxsize == size, nil
 
 }

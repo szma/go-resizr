@@ -1,7 +1,7 @@
 go-resizr
 =========
 
-Resizr is a small utility that resizes for all jpg images in a directory (and its subfolders)
+Resizr is a small utility that resizes all jpg images in a directory (and its subfolders)
 and saves them in a different destination directory.
 
 This is useful for me to have a small version of the pictures on a USB stick, or show them on my phone from a NAS over the internet or even on TV in the local LAN. 
@@ -14,7 +14,7 @@ Disclaimer
 This is my first Go program. It might be full of errors and the programming style might not be good at all.
 I used Go 1.9, but I'm pretty sure it will run with lower version's as well.
 
-Feel free to 
+Feel free to contribute or send me some hints to improve the program.
 
 Installation
 ------------

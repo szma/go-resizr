@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"github.com/nfnt/resize"
 	"github.com/urfave/cli"
@@ -31,7 +32,6 @@ func checkIfTargetImageExists(outName string, size int) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
 	//File can be decoded?
 	img, err := jpeg.Decode(file)
 	if err != nil {
@@ -63,11 +63,6 @@ func resizeJpeg(inName, outName string, size int) error {
 		m = resize.Resize(0, uint(size), img, resize.Lanczos3)
 	}
 
-	if exists, _ := checkIfTargetImageExists(outName, size); exists == true {
-		log.Println("Skipping image.")
-		return nil
-	}
-
 	out, err := os.Create(outName)
 	defer out.Close()
 	if err != nil {
@@ -93,6 +88,9 @@ func resizeOperation(origpath, resizepath string, size int) error {
 	if err != nil {
 		return err
 	}
+	if exists, _ := checkIfTargetImageExists(resizepath, size); exists == true {
+		return errors.New("Resized image exists. Skipping.")
+	}
 	err = resizeJpeg(origpath, resizepath, size)
 	if err != nil {
 		return err
@@ -115,10 +113,10 @@ func newVisitFunc(operation func(string, string, int) error, origRoot, resizeRoo
 		if ext == ".jpeg" || ext == ".jpg" {
 			relativPath, _ := filepath.Rel(origRoot, path)
 			resizepath := filepath.Join(resizeRoot, relativPath)
-			err := operation(path, resizepath, size)
-			if err != nil {
+			errop := operation(path, resizepath, size)
+			if errop != nil {
 				printOperation(path, resizepath)
-				log.Printf("Error: %q", err.Error())
+				log.Printf("Error: %q", errop.Error())
 				return nil // Skip error!
 			}
 			operationCount++

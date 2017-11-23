@@ -8,10 +8,35 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+func checkIfTargetImageExists(outName string, size int) (bool, error) {
+	//File exists?
+	if _, err := os.Stat(outName); err != nil {
+		return false, nil
+	}
+	//File can be opened?
+	file, err := os.Open(outName)
+	defer file.Close()
+	if err != nil {
+		return false, err
+	}
+
+	//File can be decoded?
+	img, err := jpeg.Decode(file)
+	if err != nil {
+		return false, err
+	}
+
+	//Size is already ok?
+	maxsize := int(math.Max(float64(img.Bounds().Size().X), float64(img.Bounds().Size().Y)))
+	return maxsize == size, nil
+
+}
 
 func resizeJpeg(inName, outName string, size int) error {
 	file, err := os.Open(inName)
@@ -30,6 +55,11 @@ func resizeJpeg(inName, outName string, size int) error {
 		m = resize.Resize(uint(size), 0, img, resize.Lanczos3)
 	} else {
 		m = resize.Resize(0, uint(size), img, resize.Lanczos3)
+	}
+
+	if exists, _ := checkIfTargetImageExists(outName, size); exists == true {
+		log.Println("Skipping image.")
+		return nil
 	}
 
 	out, err := os.Create(outName)
@@ -53,7 +83,6 @@ func printOperation(origpath, resizepath string) {
 }
 
 func resizeOperation(origpath, resizepath string, size int) error {
-	//printOperation(origpath, resizepath)
 	err := createPathToFile(resizepath)
 	if err != nil {
 		return err
@@ -94,11 +123,8 @@ func NewVisitFunc(operation func(string, string, int) error, origRoot, resizeRoo
 }
 
 func resizeTree(origRoot, resizeRoot string, size int) {
-	//visit := NewVisitFunc(printOperation, origRoot, resizeRoot)
 	visit := NewVisitFunc(resizeOperation, origRoot, resizeRoot, size)
-	//err := filepath.Walk(origRoot, visit)
 	filepath.Walk(origRoot, visit)
-	//log.Printf("Visited %d images, Walk() returned: %v", operationCount, err)
 }
 func askUserToContinue() bool {
 	fmt.Printf("Continue? [yN]: ")

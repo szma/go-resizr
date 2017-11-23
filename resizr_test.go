@@ -18,7 +18,7 @@ func TestResize(t *testing.T) {
 		t.Fail()
 	}
 	// Do the resizing
-	resizeJpeg(origfile, resizefile)
+	resizeJpeg(origfile, resizefile, 128)
 	// Check if a new file is there
 	if _, err := os.Stat(resizefile); os.IsNotExist(err) {
 		t.Fail()
@@ -39,6 +39,6 @@ func TestResize(t *testing.T) {
 }
 
 func TestResizeTree(t *testing.T) {
-	resizeTree("test/orig", "test/resized")
+	resizeTree("test/orig", "test/resized", 128)
 	//resizeTree("/home/markus/test/2013-06-09 Brenta", "test/resized/brenta")
 }

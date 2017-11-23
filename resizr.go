@@ -15,6 +15,7 @@ import (
 
 func resizeJpeg(inName, outName string, size int) error {
 	file, err := os.Open(inName)
+	defer file.Close()
 	if err != nil {
 		return err
 	}
@@ -23,7 +24,6 @@ func resizeJpeg(inName, outName string, size int) error {
 	if err != nil {
 		return err
 	}
-	file.Close()
 
 	var m image.Image
 	if img.Bounds().Size().X > img.Bounds().Size().Y {
@@ -53,7 +53,7 @@ func printOperation(origpath, resizepath string) {
 }
 
 func resizeOperation(origpath, resizepath string, size int) error {
-	printOperation(origpath, resizepath)
+	//printOperation(origpath, resizepath)
 	err := createPathToFile(resizepath)
 	if err != nil {
 		return err
@@ -82,9 +82,12 @@ func NewVisitFunc(operation func(string, string, int) error, origRoot, resizeRoo
 			resizepath := filepath.Join(resizeRoot, relativPath)
 			err := operation(path, resizepath, size)
 			if err != nil {
-				return err
+				printOperation(path, resizepath)
+				log.Printf("Error: %q", err.Error())
+				return nil // Skip error!
 			}
 			operationCount++
+			fmt.Printf("Converted: %d images.\r", operationCount)
 		}
 		return nil
 	}
@@ -93,8 +96,9 @@ func NewVisitFunc(operation func(string, string, int) error, origRoot, resizeRoo
 func resizeTree(origRoot, resizeRoot string, size int) {
 	//visit := NewVisitFunc(printOperation, origRoot, resizeRoot)
 	visit := NewVisitFunc(resizeOperation, origRoot, resizeRoot, size)
-	err := filepath.Walk(origRoot, visit)
-	log.Printf("Visited %d images, Walk() returned: %v", operationCount, err)
+	//err := filepath.Walk(origRoot, visit)
+	filepath.Walk(origRoot, visit)
+	//log.Printf("Visited %d images, Walk() returned: %v", operationCount, err)
 }
 func askUserToContinue() bool {
 	fmt.Printf("Continue? [yN]: ")
@@ -128,10 +132,9 @@ func mainCommand(c *cli.Context) error {
 }
 
 func main() {
-	//resizeTree("/home/markus/test/testbilder_orig", "test/resized/brenta")
 	app := cli.NewApp()
 	app.Name = "resizr"
-	app.Usage = "Create small image previews in seperate folder structure"
+	app.Usage = "Create small image previews in seperate folder structure\n\n   Example: resizr --dest /home/user/preview --size 1024 /home/user/pictures"
 	app.Version = "0.1"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

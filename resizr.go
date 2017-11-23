@@ -33,10 +33,10 @@ func resizeJpeg(inName, outName string, size int) error {
 	}
 
 	out, err := os.Create(outName)
+	defer out.Close()
 	if err != nil {
 		return err
 	}
-	defer out.Close()
 
 	jpeg.Encode(out, m, nil)
 

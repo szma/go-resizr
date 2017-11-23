@@ -102,7 +102,7 @@ func resizeOperation(origpath, resizepath string, size int) error {
 
 var operationCount int = 0
 
-func NewVisitFunc(operation func(string, string, int) error, origRoot, resizeRoot string, size int) func(string, os.FileInfo, error) error {
+func newVisitFunc(operation func(string, string, int) error, origRoot, resizeRoot string, size int) func(string, os.FileInfo, error) error {
 
 	return func(path string, f os.FileInfo, err error) error {
 		if f.IsDir() {
@@ -128,8 +128,8 @@ func NewVisitFunc(operation func(string, string, int) error, origRoot, resizeRoo
 	}
 }
 
-func resizeTree(origRoot, resizeRoot string, size int) {
-	visit := NewVisitFunc(resizeOperation, origRoot, resizeRoot, size)
+func ResizeTree(origRoot, resizeRoot string, size int) {
+	visit := newVisitFunc(resizeOperation, origRoot, resizeRoot, size)
 	filepath.Walk(origRoot, visit)
 }
 func askUserToContinue() bool {
@@ -159,7 +159,7 @@ func mainCommand(c *cli.Context) error {
 		log.Printf("Cancelled by user.")
 		return nil
 	}
-	resizeTree(source, dest, size)
+	ResizeTree(source, dest, size)
 	return nil
 }
 

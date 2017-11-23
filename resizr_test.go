@@ -40,6 +40,6 @@ func TestResize(t *testing.T) {
 }
 
 func TestResizeTree(t *testing.T) {
-	resizeTree("test/orig", "test/resized", 128)
+	ResizeTree("test/orig", "test/resized", 128)
 	//resizeTree("/home/markus/test/2013-06-09 Brenta", "test/resized/brenta")
 }

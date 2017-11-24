@@ -1,6 +1,5 @@
-
-  
 [![Build Status](https://api.travis-ci.org/szma/go-resizr.svg?branch=master)](https://travis-ci.org/szma/go-resizr)
+
 go-resizr
 =========
 
